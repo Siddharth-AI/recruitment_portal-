@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="paper">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TALENTHUB — The verified student archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   THE TALENT ARCHIVE — design tokens
+   Editorial gallery (cosmos) × technical precision (antimetal)
+   ══════════════════════════════════════════════ */
+:root{
+  --display:"Bricolage Grotesque",Georgia,serif;
+  --sans:"Inter Tight",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+
+  --rust:#B7401D;
+  --rust-2:#8F2F13;
+  --rust-soft:rgba(183,64,29,.10);
+  --olive:#4A5A3A;
+  --gold:#9A7B26;
+
+  --e-out:cubic-bezier(.16,1,.3,1);
+  --e-snap:cubic-bezier(.4,0,.2,1);
+  --e-spring:cubic-bezier(.34,1.4,.64,1);
+}
+[data-theme="paper"]{
+  --bg:#F4F1EB; --bg-2:#EDE9E1; --bg-3:#E4DFD5; --card:#FBF9F5;
+  --ink:#16130F; --ink-2:rgba(22,19,15,.60); --ink-3:rgba(22,19,15,.36);
+  --line:rgba(22,19,15,.13); --line-2:rgba(22,19,15,.26);
+  --grain:.055; --inv:#F4F1EB;
+}
+[data-theme="ink"]{
+  --bg:#0E0C0A; --bg-2:#14110E; --bg-3:#1B1713; --card:#16130F;
+  --ink:#F2EEE6; --ink-2:rgba(242,238,230,.58); --ink-3:rgba(242,238,230,.34);
+  --line:rgba(242,238,230,.14); --line-2:rgba(242,238,230,.26);
+  --grain:.085; --inv:#0E0C0A; --rust:#DB6234; --rust-soft:rgba(219,98,52,.13);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  font-size:16px;line-height:1.55;
+  transition:background .5s var(--e-out),color .5s var(--e-out);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:var(--grain);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+input,textarea,select{font-family:inherit;color:inherit;font-size:inherit}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+svg{display:block;flex-shrink:0}
+::selection{background:var(--rust);color:#fff}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg-2)}
+::-webkit-scrollbar-thumb{background:var(--line-2)}
+
+/* ── type ── */
+.dsp{font-family:var(--display);font-weight:600;letter-spacing:-.035em;line-height:.94}
+.d-xl{font-size:clamp(38px,6.4vw,96px)}
+.d-lg{font-size:clamp(32px,5vw,68px)}
+.d-md{font-size:clamp(28px,4vw,54px)}
+.d-sm{font-size:clamp(22px,2.6vw,34px);line-height:1.05}
+.hd{font-family:var(--display);font-weight:600;letter-spacing:-.022em;line-height:1.12}
+.h-1{font-size:clamp(24px,2.6vw,34px)}
+.h-2{font-size:20px}
+.h-3{font-size:16.5px;letter-spacing:-.012em}
+.bd{font-size:16px;line-height:1.62;color:var(--ink-2)}
+.bd-lg{font-size:clamp(17px,1.5vw,20px);line-height:1.58;color:var(--ink-2)}
+.bd-sm{font-size:14px;line-height:1.55;color:var(--ink-2)}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+.mono-sm{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
+.mono-n{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.rust{color:var(--rust)}
+.ink3{color:var(--ink-3)}
+.it{font-style:italic}
+
+/* ── layout ── */
+.wrap{width:100%;max-width:1320px;margin:0 auto;padding:0 clamp(18px,4vw,52px)}
+.wrap-n{max-width:900px}
+.row{display:flex;align-items:center}
+.btw{display:flex;align-items:center;justify-content:space-between}
+.col{display:flex;flex-direction:column}
+.wr{flex-wrap:wrap}
+.g4{gap:4px}.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}.g24{gap:24px}.g32{gap:32px}.g48{gap:48px}
+.mt6{margin-top:6px}.mt10{margin-top:10px}.mt14{margin-top:14px}.mt20{margin-top:20px}.mt28{margin-top:28px}.mt40{margin-top:40px}.mt56{margin-top:56px}.mt80{margin-top:80px}
+.f1{flex:1}.tc{text-align:center}
+.sect{padding:clamp(72px,10vw,152px) 0}
+.rule{height:1px;background:var(--line);width:100%}
+.rule-2{height:1px;background:var(--line-2);width:100%}
+
+/* ── index label (editorial numbering) ── */
+.idx{display:flex;align-items:baseline;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.idx .n{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--rust);font-weight:600}
+.idx .t{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ── buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  height:46px;padding:0 22px;font-size:14px;font-weight:500;letter-spacing:-.005em;
+  border-radius:2px;position:relative;overflow:hidden;white-space:nowrap;
+  transition:transform .18s var(--e-snap),background .24s,color .24s,border-color .24s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-fill{background:var(--ink);color:var(--inv)}
+.btn-fill:hover{background:var(--rust)}
+.btn-rust{background:var(--rust);color:#fff}
+.btn-rust:hover{background:var(--rust-2)}
+.btn-line{border:1px solid var(--line-2);color:var(--ink)}
+.btn-line:hover{border-color:var(--ink);background:var(--ink);color:var(--inv)}
+.btn-ghost{color:var(--ink-2)}
+.btn-ghost:hover{color:var(--ink)}
+.btn-lg{height:54px;padding:0 30px;font-size:15px}
+.btn-sm{height:36px;padding:0 15px;font-size:12.5px}
+.btn-blk{width:100%}
+/* underline sweep link */
+.lnk{position:relative;display:inline-block;font-weight:500}
+.lnk::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .42s var(--e-out)}
+.lnk:hover::after{transform:scaleX(1);transform-origin:left}
+
+.ibtn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);color:var(--ink-2);border-radius:2px;transition:all .2s}
+.ibtn:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ── tags ── */
+.tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.1em;text-transform:uppercase;font-weight:500;padding:4px 9px;border:1px solid var(--line-2);border-radius:2px;color:var(--ink-2)}
+.tag-rust{border-color:var(--rust);color:var(--rust)}
+.tag-fill{background:var(--ink);color:var(--inv);border-color:var(--ink)}
+.tag-ok{border-color:var(--olive);color:var(--olive)}
+[data-theme="ink"] .tag-ok{border-color:#8FA872;color:#8FA872}
+
+/* ── cursor ── */
+.cur{position:fixed;top:0;left:0;width:7px;height:7px;border-radius:50%;background:var(--rust);
+  pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:width .3s var(--e-spring),height .3s var(--e-spring),opacity .3s}
+.cur-o{position:fixed;top:0;left:0;width:30px;height:30px;border-radius:50%;border:1px solid var(--rust);
+  pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:.45;
+  transition:width .38s var(--e-spring),height .38s var(--e-spring),opacity .3s}
+.cur.on{width:0;height:0}
+.cur-o.on{width:64px;height:64px;opacity:.95;background:var(--rust-soft)}
+@media(hover:none),(max-width:900px){.cur,.cur-o{display:none}}
+
+/* ── reveal ── */
+.rv{opacity:0;transform:translateY(30px);transition:opacity 1s var(--e-out),transform 1s var(--e-out)}
+.rv.in{opacity:1;transform:none}
+.rvl{clip-path:inset(0 0 100% 0);transition:clip-path 1.1s var(--e-out)}
+.rvl.in{clip-path:inset(0 0 0 0)}
+.rvi{overflow:hidden}
+.rvi img{transform:scale(1.16);transition:transform 1.5s var(--e-out)}
+.rvi.in img{transform:scale(1)}
+
+/* ══════════ NAV ══════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:900;transition:background .4s,border-color .4s,backdrop-filter .4s;
+  border-bottom:1px solid transparent}
+.nav.stuck{background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-bottom-color:var(--line)}
+.nav-in{height:62px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.03em;display:flex;align-items:center;gap:9px}
+.brand .mk{width:22px;height:22px;background:var(--rust);border-radius:1px;position:relative;overflow:hidden}
+.brand .mk::after{content:"";position:absolute;left:4px;top:4px;width:14px;height:14px;border:1.6px solid var(--bg);border-radius:1px}
+.nav-l{display:flex;gap:26px}
+.nav-l a{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);transition:color .2s}
+.nav-l a:hover{color:var(--rust)}
+@media(max-width:900px){.nav-l{display:none}}
+
+/* ══════════ HERO ══════════ */
+.hero{padding:calc(62px + clamp(34px,6vw,74px)) 0 clamp(44px,6vw,80px);position:relative}
+.hero-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:clamp(28px,4.5vw,68px);align-items:end}
+@media(max-width:960px){.hero-grid{grid-template-columns:1fr;gap:38px}}
+.hero h1{margin-top:22px}
+.hero h1 .ln{display:block;overflow:hidden}
+.hero h1 .ln>span{display:block;transform:translateY(105%);animation:lnUp 1.15s var(--e-out) forwards}
+@keyframes lnUp{to{transform:translateY(0)}}
+
+/* portrait stack — the gallery */
+.stack-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pf{position:relative;overflow:hidden;background:var(--bg-3);border-radius:2px}
+.pf img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.06);transition:filter .7s var(--e-out),transform 1.1s var(--e-out)}
+.pf:hover img{filter:grayscale(0) contrast(1.02);transform:scale(1.045)}
+.pf .meta{position:absolute;left:0;right:0;bottom:0;padding:11px 12px;display:flex;justify-content:space-between;align-items:flex-end;
+  background:linear-gradient(to top,rgba(10,8,6,.82),transparent);color:#F4F1EB;opacity:0;transform:translateY(8px);transition:all .42s var(--e-out)}
+.pf:hover .meta{opacity:1;transform:none}
+.pf .vk{position:absolute;top:9px;right:9px;width:19px;height:19px;border-radius:50%;background:var(--rust);
+  display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.5);transition:all .4s var(--e-spring)}
+.pf:hover .vk{opacity:1;transform:none}
+.ar-t{aspect-ratio:3/4}.ar-s{aspect-ratio:1/1}.ar-w{aspect-ratio:4/3}
+
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.stat-row>div{padding:20px 0 0;border-right:1px solid var(--line)}
+.stat-row>div:last-child{border-right:none}
+.stat-row b{font-family:var(--display);font-size:clamp(28px,3.4vw,44px);font-weight:600;letter-spacing:-.04em;display:block;line-height:1}
+
+/* ══════════ MARQUEE ══════════ */
+.mq{overflow:hidden;border-block:1px solid var(--line);padding:15px 0}
+.mq-t{display:flex;gap:0;width:max-content;animation:mqRun 46s linear infinite}
+.mq:hover .mq-t{animation-play-state:paused}
+@keyframes mqRun{to{transform:translateX(-50%)}}
+.mq-i{display:flex;align-items:center;gap:11px;padding:0 26px;border-right:1px solid var(--line);white-space:nowrap}
+.mq-i img{width:24px;height:24px;border-radius:50%;object-fit:cover;filter:grayscale(1)}
+
+/* ══════════ EDITORIAL SPLIT ══════════ */
+.ed{display:grid;grid-template-columns:.42fr .58fr;gap:clamp(24px,4vw,64px)}
+@media(max-width:900px){.ed{grid-template-columns:1fr;gap:26px}}
+
+/* ══════════ MOSAIC ══════════ */
+.mos{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+.mos>*{position:relative;overflow:hidden;border-radius:2px}
+@media(max-width:900px){.mos{grid-template-columns:repeat(6,1fr)}}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c9{grid-column:span 9}
+@media(max-width:900px){.c3,.c4{grid-column:span 3}.c5,.c6,.c7,.c8,.c9{grid-column:span 6}}
+@media(max-width:560px){.mos{grid-template-columns:1fr}.c3,.c4,.c5,.c6,.c7,.c8,.c9{grid-column:span 1}}
+
+.panel{border:1px solid var(--line);background:var(--card);padding:clamp(20px,2.4vw,30px);border-radius:2px;transition:border-color .3s}
+.panel:hover{border-color:var(--line-2)}
+
+/* ══════════ STICKY STORY ══════════ */
+.story{display:grid;grid-template-columns:.46fr .54fr;gap:clamp(28px,5vw,80px);align-items:start}
+@media(max-width:900px){.story{grid-template-columns:1fr;gap:30px}}
+.st-sticky{position:sticky;top:100px}
+@media(max-width:900px){.st-sticky{position:static}}
+.st-i{padding:22px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding .4s var(--e-out)}
+.st-i .st-h{display:flex;gap:16px;align-items:baseline}
+.st-i .st-b{max-height:0;overflow:hidden;opacity:0;transition:max-height .55s var(--e-out),opacity .4s,margin .4s}
+.st-i.on .st-b{max-height:120px;opacity:1;margin-top:10px}
+.st-i .num{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);transition:color .3s}
+.st-i.on .num{color:var(--rust)}
+.st-i .ttl{font-family:var(--display);font-size:clamp(19px,2.1vw,27px);font-weight:500;letter-spacing:-.022em;color:var(--ink-3);transition:color .35s}
+.st-i.on .ttl{color:var(--ink)}
+.st-vis{border:1px solid var(--line);background:var(--card);border-radius:2px;overflow:hidden;min-height:380px;position:relative}
+.st-pane{position:absolute;inset:0;padding:26px;opacity:0;transform:translateY(14px);transition:all .55s var(--e-out);pointer-events:none}
+.st-pane.on{opacity:1;transform:none;pointer-events:auto}
+
+/* scan / process */
+.scanbox{position:relative;overflow:hidden}
+.scanbox::after{content:"";position:absolute;left:0;right:0;height:1px;top:0;
+  background:linear-gradient(90deg,transparent,var(--rust),transparent);animation:scanR 2.3s ease-in-out infinite}
+@keyframes scanR{0%{top:2%}50%{top:96%}100%{top:2%}}
+.skl{background:linear-gradient(90deg,var(--bg-2) 25%,var(--bg-3) 50%,var(--bg-2) 75%);background-size:200% 100%;animation:shm 1.6s infinite}
+@keyframes shm{to{background-position:-200% 0}}
+
+/* meters */
+.mtr{height:3px;background:var(--bg-3);overflow:hidden}
+.mtr i{display:block;height:100%;background:var(--rust);width:0;transition:width 1.3s var(--e-out)}
+.rng{transform:rotate(-90deg)}
+
+/* ══════════ GALLERY ══════════ */
+.gal{columns:4;column-gap:10px}
+@media(max-width:1000px){.gal{columns:3}}
+@media(max-width:700px){.gal{columns:2}}
+.gal>*{break-inside:avoid;margin-bottom:10px}
+
+/* ══════════ PRICE ══════════ */
+.pr{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line)}
+@media(max-width:860px){.pr{grid-template-columns:1fr}}
+.pr>div{padding:clamp(24px,2.6vw,34px);border-right:1px solid var(--line)}
+.pr>div:last-child{border-right:none}
+@media(max-width:860px){.pr>div{border-right:none;border-bottom:1px solid var(--line)}}
+.pr .on{background:var(--card)}
+
+/* ══════════ FAQ ══════════ */
+.fq{border-bottom:1px solid var(--line)}
+.fq .q{display:flex;justify-content:space-between;gap:20px;padding:24px 0;cursor:pointer;align-items:baseline}
+.fq .a{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s var(--e-out),opacity .35s}
+.fq.open .a{max-height:260px;opacity:1;padding-bottom:24px}
+.fq .pm{font-family:var(--mono);font-size:15px;color:var(--ink-3);transition:transform .4s var(--e-out),color .3s}
+.fq.open .pm{transform:rotate(45deg);color:var(--rust)}
+
+/* ══════════ APP SHELL ══════════ */
+.view{display:none}.view.on{display:block;animation:vin .5s var(--e-out)}
+@keyframes vin{from{opacity:0}to{opacity:1}}
+.app{display:none;min-height:100vh}.app.on{display:flex}
+.side{width:230px;flex-shrink:0;border-right:1px solid var(--line);background:var(--bg-2);
+  padding:16px 12px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.snav{display:flex;align-items:center;gap:10px;padding:9px 10px;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);cursor:pointer;transition:all .18s;border-radius:2px}
+.snav svg{width:15px;height:15px;stroke-width:1.7}
+.snav:hover{color:var(--ink);background:var(--bg-3)}
+.snav.on{color:var(--rust);background:var(--rust-soft)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.tbar{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(16px,2.4vw,28px);position:sticky;top:0;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);z-index:60}
+.pbody{flex:1;padding:clamp(20px,2.6vw,32px) clamp(16px,2.4vw,28px) 70px;max-width:1500px;width:100%}
+@media(max-width:900px){
+  .side{position:fixed;z-index:800;transform:translateX(-100%);transition:transform .34s var(--e-out)}
+  .side.open{transform:none}
+}
+.kg{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line)}
+@media(max-width:1000px){.kg{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.kg{grid-template-columns:1fr}}
+.kg>div{padding:18px 20px;border-right:1px solid var(--line)}
+.kg>div:last-child{border-right:none}
+@media(max-width:1000px){.kg>div:nth-child(2){border-right:none}.kg>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+.kg b{font-family:var(--display);font-size:30px;font-weight:600;letter-spacing:-.04em;display:block;margin:8px 0 4px;line-height:1}
+
+.tb{width:100%;border-collapse:collapse;font-size:13.5px}
+.tb th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);padding:0 14px 11px 0;font-weight:500}
+.tb td{padding:13px 14px 13px 0;border-top:1px solid var(--line);color:var(--ink-2)}
+.tb tbody tr:hover td{background:var(--bg-2)}
+.tb td b{color:var(--ink);font-weight:600}
+
+.avr{border-radius:50%;object-fit:cover;flex-shrink:0;filter:grayscale(1);transition:filter .4s}
+.avr:hover{filter:grayscale(0)}
+.a24{width:24px;height:24px}.a32{width:32px;height:32px}.a40{width:40px;height:40px}.a56{width:56px;height:56px}.a80{width:80px;height:80px}
+
+.fld{width:100%;height:44px;padding:0 13px;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:2px;font-size:14.5px;outline:none;transition:border-color .22s}
+.fld:focus{border-color:var(--rust)}
+textarea.fld{height:auto;padding:12px 13px;resize:none}
+.lb{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:7px}
+.chp{padding:7px 13px;border:1px solid var(--line);font-size:12.5px;font-weight:500;cursor:pointer;
+  border-radius:2px;transition:all .2s;color:var(--ink-2)}
+.chp:hover{border-color:var(--ink-2);color:var(--ink)}
+.chp.on{background:var(--ink);color:var(--inv);border-color:var(--ink)}
+.drop{border:1px dashed var(--line-2);padding:30px;text-align:center;cursor:pointer;transition:all .25s;border-radius:2px}
+.drop:hover{border-color:var(--rust);background:var(--rust-soft)}
+
+.tl{position:relative;padding-left:26px}
+.tl::before{content:"";position:absolute;left:4px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.tli{position:relative;padding-bottom:26px}
+.tli::before{content:"";position:absolute;left:-26px;top:6px;width:9px;height:9px;background:var(--rust);border-radius:50%;box-shadow:0 0 0 4px var(--bg)}
+.tli:last-child{padding-bottom:0}
+
+.sk{display:flex;align-items:center;gap:14px}
+.sk .n{width:96px;font-size:13px;font-weight:500;flex-shrink:0}
+.sk .t{flex:1;height:3px;background:var(--bg-3);overflow:hidden}
+.sk .t i{display:block;height:100%;background:var(--rust);width:0;transition:width 1.2s var(--e-out)}
+
+.otp{display:flex;gap:8px}
+.otp input{width:46px;height:54px;text-align:center;font-family:var(--mono);font-size:19px;font-weight:600;
+  background:var(--bg-2);border:1px solid var(--line);border-radius:2px;outline:none;transition:all .2s}
+.otp input:focus,.otp input.f{border-color:var(--rust)}
+.auth{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr}
+@media(max-width:920px){.auth{grid-template-columns:1fr}.auth-l{display:none}}
+.auth-l{border-right:1px solid var(--line);padding:clamp(28px,4vw,54px);display:flex;flex-direction:column;justify-content:space-between;background:var(--bg-2)}
+.auth-r{display:flex;align-items:center;justify-content:center;padding:clamp(28px,4vw,54px) 22px}
+.dv{display:flex;align-items:center;gap:14px}
+.dv::before,.dv::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:2px}
+.seg button{padding:7px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);transition:all .2s}
+.seg button.on{background:var(--ink);color:var(--inv)}
+.tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{padding:13px 0;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);position:relative;white-space:nowrap}
+.tabs button.on{color:var(--ink)}
+.tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--rust)}
+
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:1000px){.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.g2,.g3{grid-template-columns:1fr}}
+.hm{display:initial}
+/* table cells must keep table-cell — `initial` computes to `inline` and breaks the grid */
+th.hm,td.hm{display:table-cell}
+@media(max-width:820px){.hm,th.hm,td.hm{display:none}}
+
+.scrim{position:fixed;inset:0;z-index:8000;background:rgba(10,8,6,.62);opacity:0;pointer-events:none;transition:opacity .34s}
+.scrim.on{opacity:1;pointer-events:auto}
+.mdl{position:fixed;top:50%;left:50%;z-index:8100;width:min(620px,calc(100vw - 28px));max-height:88vh;overflow-y:auto;
+  transform:translate(-50%,-47%);opacity:0;pointer-events:none;background:var(--bg);border:1px solid var(--line-2);
+  padding:clamp(20px,2.6vw,30px);border-radius:2px;transition:all .38s var(--e-out)}
+.mdl.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%)}
+.tst{position:fixed;bottom:26px;left:50%;transform:translate(-50%,24px);z-index:9000;opacity:0;pointer-events:none;
+  display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--ink);color:var(--inv);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;transition:all .38s var(--e-spring)}
+.tst.on{opacity:1;transform:translate(-50%,0)}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rv,.rvl{opacity:1!important;transform:none!important;clip-path:none!important}
+}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"></div><div class="cur-o" id="curO"></div>
+
+<!-- ═══════════════ LANDING ═══════════════ -->
+<div class="view on" id="v-landing">
+
+<nav class="nav" id="nav"><div class="wrap nav-in">
+  <div class="brand"><span class="mk"></span>TALENTHUB</div>
+  <div class="nav-l">
+    <a href="#archive">Archive</a><a href="#method">Method</a><a href="#access">Access</a><a href="#faq">FAQ</a>
+  </div>
+  <div class="row g10">
+    <button class="ibtn" onclick="App.theme()" id="thBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M5 5l1.4 1.4M17.6 17.6L19 19M2 12h2M20 12h2M5 19l1.4-1.4M17.6 6.4L19 5"/></svg>
+    </button>
+    <button class="btn btn-ghost btn-sm hm" onclick="App.auth('login')">Sign in</button>
+    <button class="btn btn-fill btn-sm" onclick="App.auth('register')">Create profile</button>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="idx"><span class="n">001</span><span class="t">The verified student archive</span></div>
+      <h1 class="dsp d-xl">
+        <span class="ln"><span style="animation-delay:.06s">Talent isn't</span></span>
+        <span class="ln"><span style="animation-delay:.15s">a PDF.</span></span>
+        <span class="ln"><span class="rust it" style="animation-delay:.24s">It's a record.</span></span>
+      </h1>
+      <div class="ed mt40">
+        <div>
+          <p class="mono ink3">Est. 2026 — 64 universities</p>
+          <p class="bd mt14" style="max-width:38ch">Every claim traced to a document. Every document read, checked and signed off by a human.</p>
+        </div>
+        <div>
+          <p class="bd-lg" style="max-width:44ch;color:var(--ink)">
+            We turn a university profile into a verified, searchable talent record — education, experience, skills, and the
+            <span class="rust it">attitude</span> a transcript can never show.
+          </p>
+          <div class="row g12 wr mt28">
+            <button class="btn btn-rust btn-lg" onclick="App.auth('register')">
+              Build my record
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="btn btn-line btn-lg" onclick="App.go('recruiter')">Search the archive</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="stack-g" id="heroStack"></div>
+      <div class="stat-row mt28">
+        <div><b class="mono-n"><span class="ct" data-to="12480">0</span></b><span class="mono ink3" style="display:block;margin-top:7px">Records</span></div>
+        <div style="padding-left:18px"><b class="mono-n"><span class="ct" data-to="9312">0</span></b><span class="mono ink3" style="display:block;margin-top:7px">Verified</span></div>
+        <div style="padding-left:18px"><b class="mono-n"><span class="ct" data-to="912">0</span></b><span class="mono ink3" style="display:block;margin-top:7px">Recruiters</span></div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<div class="mq"><div class="mq-t" id="mq"></div></div>
+
+<!-- TENSION -->
+<section class="sect" id="method"><div class="wrap">
+  <div class="ed">
+    <div class="rv"><div class="idx"><span class="n">002</span><span class="t">The problem</span></div></div>
+    <div>
+      <h2 class="dsp d-lg rv">Nobody reads<br>the résumé.<br><span class="ink3 it">They can't verify it.</span></h2>
+      <div class="g2 mt40">
+        <p class="bd rv">A recruiter spends six seconds per CV. Not because they don't care — because there is no way to tell an honest claim from an invented one at scale. So they filter by university brand and hope.</p>
+        <p class="bd rv">Meanwhile the student who actually shipped something, led something, survived something — has no way to prove it. Attitude, the thing every hiring manager says matters most, is completely absent from the page.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- MOSAIC -->
+<section class="sect" style="background:var(--bg-2);border-block:1px solid var(--line)"><div class="wrap">
+  <div class="idx rv"><span class="n">003</span><span class="t">What a record contains</span></div>
+  <div class="mos mt40">
+    <div class="c7 panel rv">
+      <span class="tag tag-rust">Attitude</span>
+      <h3 class="hd h-1 mt20">The part a transcript<br>can never show.</h3>
+      <p class="bd mt14" style="max-width:46ch">A 90-second video introduction and a scored questionnaire, mapped to three traits hiring managers weight above grades.</p>
+      <div class="g3 mt28" id="attGrid"></div>
+    </div>
+
+    <div class="c5 panel rv" style="display:flex;flex-direction:column">
+      <span class="tag">Verification</span>
+      <h3 class="hd h-1 mt20">Read by machine.<br>Signed by a human.</h3>
+      <div class="scanbox mt28" style="border:1px solid var(--line);padding:16px;background:var(--bg)">
+        <div class="skl" style="width:64%;height:7px"></div>
+        <div class="skl mt10" style="width:88%;height:7px"></div>
+        <div class="skl mt10" style="width:74%;height:7px"></div>
+        <div class="skl mt10" style="width:42%;height:7px"></div>
+      </div>
+      <div class="btw mt20" style="margin-top:auto;padding-top:20px">
+        <span class="mono ink3">OCR confidence</span><span class="mono-n rust" style="font-size:20px;font-weight:600">98.4%</span>
+      </div>
+    </div>
+
+    <div class="c5 panel rv">
+      <span class="tag">Retrieval</span>
+      <h3 class="hd h-1 mt20">Ask in plain English.</h3>
+      <div class="mt20" style="border:1px solid var(--line);background:var(--bg);padding:14px;min-height:52px">
+        <span class="mono-n" id="aiType" style="font-size:12.5px;line-height:1.7;color:var(--ink)"></span>
+      </div>
+      <div class="col g8 mt14" id="aiRes"></div>
+    </div>
+
+    <div class="c7 panel rv">
+      <span class="tag">Signal</span>
+      <h3 class="hd h-1 mt20">Every edit moves the score.</h3>
+      <p class="bd mt14" style="max-width:44ch">Students see exactly which recruiter opened their record, what's missing, and what it's worth.</p>
+      <svg viewBox="0 0 520 118" class="mt28" style="width:100%;height:118px" preserveAspectRatio="none">
+        <line x1="0" y1="30" x2="520" y2="30" stroke="var(--line)"/><line x1="0" y1="74" x2="520" y2="74" stroke="var(--line)"/>
+        <path id="sPath" d="M0,104 C60,98 90,74 140,78 C196,82 220,44 276,40 C332,36 358,58 410,30 C462,2 490,14 520,8"
+          fill="none" stroke="var(--rust)" stroke-width="1.6" stroke-dasharray="900" stroke-dashoffset="900"/>
+        <circle cx="410" cy="30" r="3.4" fill="var(--rust)"/>
+      </svg>
+    </div>
+  </div>
+</div></section>
+
+<!-- STICKY STORY -->
+<section class="sect"><div class="wrap">
+  <div class="idx rv"><span class="n">004</span><span class="t">The method</span></div>
+  <div class="story mt40">
+    <div><div class="st-sticky" id="stList"></div></div>
+    <div class="st-vis" id="stVis"></div>
+  </div>
+</div></section>
+
+<!-- GALLERY -->
+<section class="sect" id="archive" style="background:var(--bg-2);border-block:1px solid var(--line)"><div class="wrap">
+  <div class="btw wr g16">
+    <div class="rv" style="flex:1;min-width:260px">
+      <div class="idx"><span class="n">005</span><span class="t">The archive</span></div>
+      <h2 class="dsp d-md mt28">Real people.<br>Real documents.</h2>
+    </div>
+    <button class="btn btn-line rv" onclick="App.go('recruiter')">Open full archive →</button>
+  </div>
+  <div class="gal mt40" id="gal"></div>
+</div></section>
+
+<!-- PRICING -->
+<section class="sect" id="access"><div class="wrap">
+  <div class="idx rv"><span class="n">006</span><span class="t">Access</span></div>
+  <div class="ed mt40" style="align-items:end">
+    <h2 class="dsp d-md rv">Free for students.<br><span class="ink3 it">Always.</span></h2>
+    <p class="bd rv" style="max-width:40ch">Recruiters and universities fund the archive. A student never pays to be discoverable.</p>
+  </div>
+  <div class="pr mt40 rv" id="pr"></div>
+</div></section>
+
+<!-- FAQ -->
+<section class="sect" id="faq" style="background:var(--bg-2);border-block:1px solid var(--line)"><div class="wrap wrap-n">
+  <div class="idx rv"><span class="n">007</span><span class="t">Questions</span></div>
+  <div class="mt40" id="fq"></div>
+</div></section>
+
+<!-- CTA -->
+<section class="sect"><div class="wrap tc">
+  <h2 class="dsp d-lg rv">Your record<br><span class="rust it">is your proof.</span></h2>
+  <div class="row g12 mt40 rv" style="justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-rust btn-lg" onclick="App.auth('register')">Create free record</button>
+    <button class="btn btn-line btn-lg" onclick="App.go('recruiter')">I'm hiring</button>
+  </div>
+</div></section>
+
+<footer style="border-top:1px solid var(--line);padding:44px 0 34px">
+  <div class="wrap">
+    <div class="btw wr g32" style="align-items:flex-start">
+      <div style="max-width:280px">
+        <div class="brand"><span class="mk"></span>TALENTHUB</div>
+        <p class="bd-sm mt14">The verified student archive. Built for students first.</p>
+      </div>
+      <div class="row g48 wr" style="align-items:flex-start">
+        <div class="col g10"><span class="mono ink3">Portals</span>
+          <a class="lnk bd-sm" onclick="App.go('student')">Student</a>
+          <a class="lnk bd-sm" onclick="App.go('recruiter')">Recruiter</a>
+          <a class="lnk bd-sm" onclick="App.go('admin')">Admin</a></div>
+        <div class="col g10"><span class="mono ink3">Platform</span>
+          <a class="lnk bd-sm" href="#method">Method</a><a class="lnk bd-sm" href="#archive">Archive</a><a class="lnk bd-sm" href="#access">Access</a></div>
+        <div class="col g10"><span class="mono ink3">Legal</span>
+          <a class="lnk bd-sm">Privacy</a><a class="lnk bd-sm">Terms</a><a class="lnk bd-sm">GDPR</a></div>
+      </div>
+    </div>
+    <div class="rule mt40"></div>
+    <div class="btw wr g12" style="padding-top:20px">
+      <span class="mono ink3">© 2026 TalentHub — interactive prototype</span>
+      <span class="mono ink3">Attitude-focused student employer portal</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<!-- ═══════════════ AUTH ═══════════════ -->
+<div class="view" id="v-auth"><div class="auth">
+  <div class="auth-l">
+    <div class="brand" style="cursor:pointer" onclick="App.go('landing')"><span class="mk"></span>TALENTHUB</div>
+    <div>
+      <div class="idx" style="border-color:var(--line)"><span class="n">—</span><span class="t">Record no. 04182</span></div>
+      <h2 class="dsp d-md mt28">Verified<br><span class="rust it">once.</span></h2>
+      <div class="mt40" style="border:1px solid var(--line);background:var(--bg);padding:18px;max-width:340px">
+        <div class="row g12">
+          <img class="avr a40" id="authAv" alt="">
+          <div class="f1"><div class="hd h-3">Priya Sharma</div><div class="mono ink3 mt6">Imperial College</div></div>
+          <span class="tag tag-ok">97</span>
+        </div>
+        <div class="col g12 mt20">
+          <div><div class="btw"><span class="mono ink3">Documents</span><span class="mono-n" style="font-size:11px">6/6</span></div><div class="mtr mt6"><i style="width:100%"></i></div></div>
+          <div><div class="btw"><span class="mono ink3">Attitude</span><span class="mono-n" style="font-size:11px">8.8</span></div><div class="mtr mt6"><i style="width:88%"></i></div></div>
+        </div>
+      </div>
+    </div>
+    <p class="mono ink3">12,480 records — 64 universities</p>
+  </div>
+
+  <div class="auth-r"><div style="width:100%;max-width:380px">
+    <button class="btn btn-ghost btn-sm" onclick="App.go('landing')" style="padding:0;margin-bottom:26px">← Back</button>
+
+    <div id="a-role">
+      <div class="idx"><span class="n">001</span><span class="t">Choose access</span></div>
+      <h2 class="dsp d-sm mt20">How will you<br>use the archive?</h2>
+      <div class="col g10 mt28" id="roleList"></div>
+      <p class="bd-sm mt28">Already registered? <span class="lnk rust" style="cursor:pointer" onclick="App.astep('login')">Sign in</span></p>
+    </div>
+
+    <div id="a-login" style="display:none">
+      <div class="idx"><span class="n">002</span><span class="t">Sign in</span></div>
+      <h2 class="dsp d-sm mt20">Welcome back.</h2>
+      <div class="col g14 mt28">
+        <button class="btn btn-line btn-blk" onclick="App.oauth()">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.5l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H3.1a10 10 0 0 0 0 9z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.7 9.4 5.9 12 5.9z"/></svg>
+          Continue with Google</button>
+        <div class="dv"><span class="mono ink3">or</span></div>
+        <div><label class="lb">University email</label><input class="fld" id="lgMail" value="p.sharma@imperial.ac.uk"></div>
+        <div><label class="lb">Password</label><input class="fld" type="password" value="••••••••••"></div>
+        <button class="btn btn-fill btn-blk" onclick="App.astep('otp')">Continue</button>
+        <button class="btn btn-ghost btn-blk" onclick="App.astep('magic')">Email me a magic link</button>
+      </div>
+    </div>
+
+    <div id="a-otp" style="display:none">
+      <div class="idx"><span class="n">003</span><span class="t">Verify</span></div>
+      <h2 class="dsp d-sm mt20">Check your inbox.</h2>
+      <p class="bd-sm mt14">Six-digit code sent to <span class="mono-n" id="otpMail" style="color:var(--ink)">p.sharma@imperial.ac.uk</span></p>
+      <div class="otp mt28" id="otpBox"></div>
+      <div class="mt20"><span class="tag tag-ok">✓ imperial.ac.uk — verified domain</span></div>
+      <button class="btn btn-fill btn-blk mt28" onclick="App.otpDone()">Verify &amp; continue</button>
+      <p class="mono ink3 mt20 tc">Resend in 0:28</p>
+    </div>
+
+    <div id="a-magic" style="display:none">
+      <div class="idx"><span class="n">003</span><span class="t">Magic link</span></div>
+      <h2 class="dsp d-sm mt20">Link sent.</h2>
+      <p class="bd-sm mt14">Open it from this device. It expires in 10 minutes.</p>
+      <button class="btn btn-fill btn-blk mt28" onclick="App.otpDone()">Simulate link click →</button>
+      <button class="btn btn-ghost btn-blk mt10" onclick="App.astep('login')">Back to sign in</button>
+    </div>
+  </div></div>
+</div></div>
+
+<!-- ═══════════════ ONBOARDING ═══════════════ -->
+<div class="view" id="v-ob">
+  <div style="min-height:100vh;display:flex;flex-direction:column">
+    <div style="border-bottom:1px solid var(--line)"><div class="wrap btw" style="height:62px">
+      <div class="brand"><span class="mk"></span>TALENTHUB</div>
+      <button class="btn btn-ghost btn-sm" onclick="App.go('student')">Skip</button>
+    </div></div>
+    <div style="border-bottom:1px solid var(--line)"><div class="wrap btw" style="height:44px">
+      <span class="mono ink3">Step <span id="obN" style="color:var(--rust)">01</span> / 05</span>
+      <div style="flex:1;margin:0 24px;height:1px;background:var(--bg-3);position:relative">
+        <i id="obBar" style="position:absolute;left:0;top:0;height:1px;background:var(--rust);width:20%;transition:width .55s var(--e-out);display:block"></i>
+      </div>
+      <span class="mono-n ink3" id="obPct" style="font-size:11px">20%</span>
+    </div></div>
+
+    <div class="wrap f1" style="display:flex;align-items:center;padding-block:clamp(30px,5vw,60px)">
+      <div style="width:100%;max-width:620px">
+        <div class="ob" data-s="1">
+          <div class="idx"><span class="n">001</span><span class="t">Identity</span></div>
+          <h2 class="dsp d-sm mt20">Who are you?</h2>
+          <div class="row g20 mt28 wr">
+            <img class="avr a80" id="obAv" alt="" style="width:96px;height:96px;border-radius:2px;filter:grayscale(1)">
+            <div class="f1 col g14" style="min-width:240px">
+              <div><label class="lb">Full name</label><input class="fld" value="Priya Sharma"></div>
+              <div><label class="lb">Headline</label><input class="fld" value="Final-year CS · Frontend & AI"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ob" data-s="2" style="display:none">
+          <div class="idx"><span class="n">002</span><span class="t">Education</span></div>
+          <h2 class="dsp d-sm mt20">Where do you study?</h2>
+          <div class="col g14 mt28">
+            <div><label class="lb">University</label><select class="fld" id="obUni"></select></div>
+            <div class="g2"><div><label class="lb">Degree</label><input class="fld" value="BSc Computer Science"></div>
+            <div><label class="lb">Graduation</label><select class="fld"><option>2025</option><option selected>2026</option><option>2027</option></select></div></div>
+          </div>
+        </div>
+        <div class="ob" data-s="3" style="display:none">
+          <div class="idx"><span class="n">003</span><span class="t">Skills</span></div>
+          <h2 class="dsp d-sm mt20">What can you do?</h2>
+          <div class="row g8 wr mt28" id="obSk"></div>
+        </div>
+        <div class="ob" data-s="4" style="display:none">
+          <div class="idx"><span class="n">004</span><span class="t">Intent</span></div>
+          <h2 class="dsp d-sm mt20">What are you after?</h2>
+          <div class="row g8 wr mt28" id="obRo"></div>
+          <div class="g2 mt28"><div><label class="lb">Available from</label><select class="fld"><option selected>July 2026</option><option>Immediately</option></select></div>
+          <div><label class="lb">Location</label><input class="fld" value="London · Remote"></div></div>
+        </div>
+        <div class="ob" data-s="5" style="display:none">
+          <div class="idx"><span class="n">005</span><span class="t">Evidence</span></div>
+          <h2 class="dsp d-sm mt20">Prove it.</h2>
+          <p class="bd-sm mt14">PDF, PNG or JPG — max 10 MB. Reviewed by a human within 24 hours.</p>
+          <div class="drop mt20" onclick="App.upload()">
+            <span class="mono rust">＋ Drop files or browse</span>
+            <p class="bd-sm mt10">Degree certificate · Transcript · Offer letters</p>
+          </div>
+          <div class="col g8 mt20" id="obDocs"></div>
+        </div>
+
+        <div class="row g10 mt56">
+          <button class="btn btn-line" id="obBack" onclick="App.ob(-1)" style="visibility:hidden">← Back</button>
+          <div class="f1"></div>
+          <button class="btn btn-fill" id="obNext" onclick="App.ob(1)">Continue →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PORTAL ═══════════════ -->
+<div class="app" id="v-app">
+  <aside class="side" id="side">
+    <div class="row g10" style="padding:4px 8px 20px">
+      <span class="brand" style="font-size:14px"><span class="mk" style="width:18px;height:18px"></span>TALENTHUB</span>
+    </div>
+    <div id="sideNav" class="f1"></div>
+    <div style="border-top:1px solid var(--line);padding:12px 8px 4px;display:flex;align-items:center;gap:10px">
+      <img class="avr a32" id="sideAv" alt="">
+      <div style="min-width:0;flex:1"><div class="hd h-3" id="sideName" style="font-size:12.5px">—</div><div class="mono ink3" id="sideSub" style="font-size:9px">—</div></div>
+      <button class="ibtn" style="width:26px;height:26px" onclick="App.go('landing')" title="Exit">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="tbar">
+      <div class="row g12">
+        <button class="ibtn" onclick="document.getElementById('side').classList.toggle('open')" style="display:none" id="burg">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <span class="mono ink3" id="crumb">—</span>
+      </div>
+      <div class="row g10">
+        <button class="ibtn" onclick="App.theme()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M5 5l1.4 1.4M17.6 17.6L19 19M2 12h2M20 12h2M5 19l1.4-1.4M17.6 6.4L19 5"/></svg></button>
+        <button class="ibtn" onclick="App.notif()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+        <img class="avr a32" id="topAv" alt="">
+      </div>
+    </div>
+    <div class="pbody" id="pbody"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" onclick="App.close()"></div>
+<div class="mdl" id="mdl"><div id="mdlBody"></div></div>
+<div class="tst" id="tst"><span id="tstMsg">Done</span></div>
+
+<script>
+const A={
+students:[
+ {id:1,n:'Priya Sharma',u:'Imperial College London',d:'BSc Computer Science',y:'2026',img:'assets/s1.jpg',score:97,role:'Frontend Engineer',loc:'London',v:1,sk:['React','TypeScript','Node.js','Figma'],att:{Ownership:8.9,Collaboration:9.2,Resilience:8.4}},
+ {id:2,n:'Marcus Bell',u:'University of Manchester',d:'BEng Mechanical Eng.',y:'2026',img:'assets/s2.jpg',score:91,role:'Product Analyst',loc:'Manchester',v:1,sk:['Python','SQL','Tableau','CAD'],att:{Ownership:8.2,Collaboration:8.0,Resilience:9.1}},
+ {id:3,n:'Aisha Okonkwo',u:'University of Edinburgh',d:'MSc Data Science',y:'2025',img:'assets/s3.jpg',score:95,role:'ML Engineer',loc:'Edinburgh',v:1,sk:['PyTorch','Pandas','AWS','Docker'],att:{Ownership:9.4,Collaboration:8.6,Resilience:8.8}},
+ {id:4,n:'Tom Lindqvist',u:'KTH Royal Institute',d:'BSc Information Systems',y:'2027',img:'assets/s4.jpg',score:84,role:'Backend Developer',loc:'Stockholm',v:0,sk:['Go','PostgreSQL','Kubernetes'],att:{Ownership:7.8,Collaboration:8.4,Resilience:8.1}},
+ {id:5,n:'Sofia Duarte',u:'University of Warwick',d:'BA Business & Marketing',y:'2026',img:'assets/s5.jpg',score:88,role:'Growth Marketer',loc:'Coventry',v:1,sk:['SEO','HubSpot','Analytics'],att:{Ownership:8.6,Collaboration:9.0,Resilience:7.9}},
+ {id:6,n:'Daniel Osei',u:'University College London',d:'BSc Economics',y:'2025',img:'assets/s6.jpg',score:90,role:'Finance Analyst',loc:'London',v:1,sk:['Excel','Python','Bloomberg'],att:{Ownership:9.0,Collaboration:8.2,Resilience:8.9}},
+ {id:7,n:'Elena Vasquez',u:'University of Bristol',d:'MEng Robotics',y:'2026',img:'assets/s7.jpg',score:93,role:'Robotics Engineer',loc:'Bristol',v:1,sk:['ROS','C++','MATLAB'],att:{Ownership:9.1,Collaboration:8.7,Resilience:9.3}},
+ {id:8,n:'Jonas Weber',u:'TU München',d:'MSc Software Engineering',y:'2025',img:'assets/s8.jpg',score:89,role:'Platform Engineer',loc:'Munich',v:0,sk:['Rust','gRPC','Terraform'],att:{Ownership:8.4,Collaboration:8.1,Resilience:8.6}},
+],
+unis:['Imperial College London','University of Manchester','University of Edinburgh','KTH Royal Institute','University of Warwick','University College London','University of Bristol','TU München'],
+docs:[
+ {n:'Degree_Certificate_2026.pdf',s:'Priya Sharma',t:'Education',st:'pending',ocr:98,sz:'1.4 MB'},
+ {n:'Internship_Letter_Meta.pdf',s:'Aisha Okonkwo',t:'Experience',st:'pending',ocr:94,sz:'820 KB'},
+ {n:'AWS_Certification.png',s:'Tom Lindqvist',t:'Certification',st:'pending',ocr:61,sz:'2.1 MB'},
+ {n:'Transcript_Y2.pdf',s:'Marcus Bell',t:'Education',st:'approved',ocr:99,sz:'640 KB'},
+ {n:'ID_Passport_scan.jpg',s:'Sofia Duarte',t:'Identity',st:'rejected',ocr:38,sz:'3.8 MB'},
+],
+};
+const S=A.students, eur=n=>'£'+n.toLocaleString('en-US');
+const F=id=>S.find(x=>x.id===id)||S[0];
+
+const App={
+role_:'student',
+init(){this.cursor();this.nav();this.heroStack();this.mq();this.att();this.story();this.gal();this.price();this.faq();this.ai();this.roles();
+  this.reveal(); // must run last — observes .rv nodes injected by the generators above
+  addEventListener('resize',()=>this.burg());this.burg();},
+
+burg(){const b=document.getElementById('burg');if(b)b.style.display=innerWidth<=900?'flex':'none';},
+
+theme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='paper';
+  h.setAttribute('data-theme',d?'ink':'paper');this.toast(d?'Ink mode':'Paper mode');},
+
+cursor(){const c=document.getElementById('cur'),o=document.getElementById('curO');let x=0,y=0,ox=0,oy=0;
+  addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY;c.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`});
+  (function l(){ox+=(x-ox)*.15;oy+=(y-oy)*.15;o.style.transform=`translate(${ox}px,${oy}px) translate(-50%,-50%)`;requestAnimationFrame(l)})();
+  addEventListener('mouseover',e=>{const h=e.target.closest('button,a,.pf,.st-i,.fq .q,.panel,.chp');
+    c.classList.toggle('on',!!h);o.classList.toggle('on',!!h)});},
+
+nav(){const n=document.getElementById('nav');const f=()=>n.classList.toggle('stuck',scrollY>14);
+  addEventListener('scroll',f,{passive:true});f();},
+
+reveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;
+  e.target.classList.add('in');
+  e.target.querySelectorAll('.mtr i,.sk .t i').forEach((b,i)=>setTimeout(()=>b.style.width=(b.dataset.w||70)+'%',120+i*110));
+  e.target.querySelectorAll('.ct').forEach(c=>this.count(c));
+  const p=e.target.querySelector('#sPath');if(p){p.style.transition='stroke-dashoffset 2s cubic-bezier(.16,1,.3,1)';p.style.strokeDashoffset='0';}
+  io.unobserve(e.target)}),{threshold:.15,rootMargin:'-30px'});
+  document.querySelectorAll('.rv,.rvl,.rvi').forEach((el,i)=>{el.style.transitionDelay=(i%3)*90+'ms';io.observe(el)});},
+
+count(el){if(el.dataset.d)return;el.dataset.d=1;const to=+el.dataset.to,t0=performance.now();
+  (function s(t){const p=Math.min(1,(t-t0)/1600),e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(to*e).toLocaleString('en-US');if(p<1)requestAnimationFrame(s)})(t0);},
+
+pfCard(s,ar){return `<div class="pf ${ar||'ar-t'}" onclick="App.cand(${s.id})">
+  <img src="${s.img}" alt="${s.n}">
+  ${s.v?'<span class="vk"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></span>':''}
+  <div class="meta"><div><div style="font-size:12.5px;font-weight:600">${s.n}</div>
+  <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.72;margin-top:3px">${s.role}</div></div>
+  <span style="font-family:var(--mono);font-size:12px;font-weight:600">${s.score}</span></div></div>`;},
+
+heroStack(){document.getElementById('heroStack').innerHTML=
+  this.pfCard(S[0],'ar-t')+this.pfCard(S[2],'ar-s')+this.pfCard(S[4],'ar-s')+this.pfCard(S[6],'ar-t');
+  document.getElementById('authAv').src=S[0].img;
+  document.getElementById('obAv').src=S[0].img;
+  document.querySelectorAll('.hero .ct').forEach(c=>this.count(c));
+  // parallax divergence on the two columns
+  const cards=[...document.querySelectorAll('#heroStack .pf')];
+  addEventListener('scroll',()=>{const y=scrollY;
+    cards.forEach((c,i)=>{c.style.transform=`translateY(${y*(i%2?-.028:.034)}px)`});},{passive:true});},
+
+mq(){const one=S.map(s=>`<div class="mq-i"><img src="${s.img}"><span class="mono">${s.n}</span><span class="mono ink3">${s.role}</span><span class="mono rust">${s.score}</span></div>`).join('');
+  document.getElementById('mq').innerHTML=one+one;},
+
+att(){const a=S[0].att;document.getElementById('attGrid').innerHTML=Object.entries(a).map(([k,v])=>`
+  <div style="border:1px solid var(--line);padding:15px;background:var(--bg)">
+    <div class="mono ink3">${k}</div>
+    <div class="mono-n rust" style="font-size:26px;font-weight:600;margin:8px 0 10px">${v}</div>
+    <div class="mtr"><i data-w="${v*10}"></i></div></div>`).join('');},
+
+_st:0,
+story(){const ST=[
+ ['Register','Sign up with a university email. The domain is verified instantly — no waiting on an administrator.'],
+ ['Compose','Education, experience, projects, skills. Guided, autosaved, with a live completeness meter.'],
+ ['Evidence','Upload the documents behind each claim. OCR checks legibility, a human signs it off.'],
+ ['Discovery','Your record becomes searchable in plain English. You decide what stays private.'],
+];
+ document.getElementById('stList').innerHTML=ST.map((s,i)=>`
+  <div class="st-i ${i===0?'on':''}" onclick="App.st(${i})">
+    <div class="st-h"><span class="num">0${i+1}</span><span class="ttl">${s[0]}</span></div>
+    <div class="st-b"><p class="bd-sm" style="max-width:40ch">${s[1]}</p></div></div>`).join('');
+ document.getElementById('stVis').innerHTML=ST.map((s,i)=>`<div class="st-pane ${i===0?'on':''}" data-p="${i}">${this.stPane(i)}</div>`).join('');
+ this._sti=setInterval(()=>this.st((this._st+1)%4),4600);},
+
+stPane(i){
+ if(i===0)return `<div class="mono ink3">Domain check</div>
+  <div class="mt20"><label class="lb">University email</label><input class="fld" value="p.sharma@imperial.ac.uk" readonly></div>
+  <div class="mt20"><span class="tag tag-ok">✓ imperial.ac.uk resolved</span></div>
+  <div class="mt28" style="border-top:1px solid var(--line);padding-top:18px">
+   <div class="btw"><span class="mono ink3">Institution</span><span class="bd-sm" style="color:var(--ink)">Imperial College London</span></div>
+   <div class="btw mt10"><span class="mono ink3">Cohort</span><span class="bd-sm" style="color:var(--ink)">Class of 2026</span></div></div>`;
+ if(i===1)return `<div class="mono ink3">Composition</div>
+  <div class="row g8 wr mt20">${['React','TypeScript','Node.js','Figma','Python'].map(k=>`<span class="chp on">${k}</span>`).join('')}</div>
+  <div class="mt28">${S[0].sk.map((k,j)=>`<div class="sk mt14"><span class="n">${k}</span><span class="t"><i style="width:${[94,90,82,76][j]}%"></i></span><span class="mono-n" style="font-size:11px">${[9.4,9.0,8.2,7.6][j]}</span></div>`).join('')}</div>
+  <div class="btw mt28" style="border-top:1px solid var(--line);padding-top:16px"><span class="mono ink3">Completeness</span><span class="mono-n rust" style="font-size:19px;font-weight:600">78%</span></div>`;
+ if(i===2)return `<div class="mono ink3">Evidence review</div>
+  <div class="scanbox mt20" style="border:1px solid var(--line);padding:15px;background:var(--bg-2)">
+   <div class="btw"><span class="bd-sm" style="color:var(--ink)">Degree_Certificate.pdf</span><span class="mono rust">Reading</span></div>
+   <div class="skl mt14" style="width:78%;height:6px"></div><div class="skl mt10" style="width:92%;height:6px"></div><div class="skl mt10" style="width:56%;height:6px"></div></div>
+  <div class="mt14" style="border:1px solid var(--line);padding:15px">
+   <div class="btw"><span class="bd-sm" style="color:var(--ink)">Internship_Letter.pdf</span><span class="tag tag-ok">Signed off</span></div></div>
+  <div class="btw mt28" style="border-top:1px solid var(--line);padding-top:16px"><span class="mono ink3">OCR confidence</span><span class="mono-n rust" style="font-size:19px;font-weight:600">98.4%</span></div>`;
+ return `<div class="mono ink3">Retrieval</div>
+  <div class="mt20" style="border:1px solid var(--line);padding:13px;background:var(--bg-2)">
+   <span class="mono-n" style="font-size:12px">"final-year CS · London · React · verified"</span></div>
+  <div class="col g8 mt20">${S.filter(s=>s.v).slice(0,3).map(s=>`
+   <div class="row g12" style="border:1px solid var(--line);padding:11px">
+    <img class="avr a32" src="${s.img}"><div class="f1"><div class="hd h-3" style="font-size:13px">${s.n}</div>
+    <div class="mono ink3" style="margin-top:3px">${s.u}</div></div>
+    <span class="mono-n rust" style="font-size:14px;font-weight:600">${s.score}</span></div>`).join('')}</div>`;},
+
+st(i){this._st=i;
+ document.querySelectorAll('.st-i').forEach((e,k)=>e.classList.toggle('on',k===i));
+ document.querySelectorAll('.st-pane').forEach((e,k)=>e.classList.toggle('on',k===i));},
+
+gal(){const ars=['ar-t','ar-s','ar-w','ar-t','ar-s','ar-t','ar-w','ar-s'];
+ document.getElementById('gal').innerHTML=S.map((s,i)=>this.pfCard(s,ars[i])).join('');},
+
+price(){const P=[
+ ['Student','Free','Unlimited record edits · Document verification · Video intro &amp; attitude score · Public record link · CV export',0,'Create record',"App.auth('register')"],
+ ['Recruiter','£249','Everything in Student · Plain-English archive search · 500 unlocks / month · Shortlists &amp; compare · 5 team seats · ATS export',1,'Start trial',"App.go('recruiter')"],
+ ['University','Custom','Cohort dashboards · Bulk verification · Employability analytics · SSO &amp; EU data residency · Success manager',0,'Talk to us',"App.toast('Sales enquiry')"],
+];
+ document.getElementById('pr').innerHTML=P.map((p,i)=>`
+  <div class="${p[3]?'on':''}">
+   <div class="btw"><span class="mono ink3">0${i+1}</span>${p[3]?'<span class="tag tag-rust">Popular</span>':''}</div>
+   <h3 class="dsp d-sm mt20">${p[0]}</h3>
+   <div class="row g6 mt14" style="align-items:baseline"><span class="mono-n" style="font-size:30px;font-weight:600">${p[1]}</span>
+   ${p[1]!=='Free'&&p[1]!=='Custom'?'<span class="mono ink3">/mo</span>':''}</div>
+   <div class="rule mt20"></div>
+   <div class="col g10 mt20">${p[2].split(' · ').map(f=>`<div class="row g10"><span class="rust mono">—</span><span class="bd-sm" style="color:var(--ink)">${f}</span></div>`).join('')}</div>
+   <button class="btn ${p[3]?'btn-rust':'btn-line'} btn-blk mt28" onclick="${p[5]}">${p[4]}</button>
+  </div>`).join('');},
+
+faq(){const Q=[
+ ['Is it really free for students?','Permanently. Students never pay for a record, verification, or discovery. Recruiter and university plans fund the archive.'],
+ ['How does verification actually work?','You upload a file. OCR checks it is legible and extracts key fields. A human admin then approves, rejects, or requests a resubmission — rejections always carry a reason.'],
+ ['What is an attitude insight?','A 90-second video introduction plus a short scored questionnaire, mapped to ownership, collaboration and resilience. You choose whether the video is public.'],
+ ['Who can see my record?','Private by default. Visibility is controlled per section. Recruiters only see verified fields unless you opt in to share more.'],
+ ['Where is my data stored?','In the EU. Exportable on demand, deletable in one click. Profile data is never sold.'],
+];
+ document.getElementById('fq').innerHTML=Q.map((q,i)=>`
+  <div class="fq rv" onclick="this.classList.toggle('open')">
+   <div class="q"><span class="row g16" style="align-items:baseline"><span class="mono ink3">0${i+1}</span><span class="hd h-2">${q[0]}</span></span><span class="pm">＋</span></div>
+   <div class="a"><p class="bd" style="max-width:60ch;padding-left:34px">${q[1]}</p></div></div>`).join('');},
+
+ai(){const q='final-year CS in London · React · verified internship';
+ const el=document.getElementById('aiType'),box=document.getElementById('aiRes');let i=0;
+ const type=()=>{if(i<=q.length){el.textContent=q.slice(0,i);i++;setTimeout(type,42);}
+  else setTimeout(()=>{box.innerHTML=S.filter(s=>s.v).slice(0,2).map((s,k)=>`
+    <div class="row g10" style="border:1px solid var(--line);padding:9px 11px;opacity:0;animation:vin .5s var(--e-out) ${k*.16}s forwards">
+     <img class="avr a24" src="${s.img}"><span class="bd-sm f1" style="color:var(--ink)">${s.n}</span>
+     <span class="mono-n rust" style="font-size:12px;font-weight:600">${s.score}</span></div>`).join('');
+   setTimeout(()=>{box.innerHTML='';i=0;type();},4800);},900);};
+ setTimeout(type,1100);},
+
+roles(){const R=[['student','Student','Build a verified record — free'],['recruiter','Recruiter','Search verified graduate talent'],['admin','Admin','Verify documents & run the platform']];
+ document.getElementById('roleList').innerHTML=R.map((r,i)=>`
+  <div onclick="App.role('${r[0]}')" style="border:1px solid var(--line);padding:16px;cursor:pointer;display:flex;gap:14px;align-items:center;transition:border-color .2s" onmouseover="this.style.borderColor='var(--rust)'" onmouseout="this.style.borderColor='var(--line)'">
+   <span class="mono rust">0${i+1}</span>
+   <div class="f1"><div class="hd h-3">${r[1]}</div><div class="bd-sm mt6">${r[2]}</div></div>
+   <span class="mono ink3">→</span></div>`).join('');},
+
+/* ── router ── */
+go(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+ document.getElementById('v-app').classList.remove('on');scrollTo({top:0,behavior:'instant'});
+ if(v==='landing'){document.getElementById('v-landing').classList.add('on');return;}
+ if(v==='auth'){document.getElementById('v-auth').classList.add('on');return;}
+ if(v==='onboard'){document.getElementById('v-ob').classList.add('on');this.obInit();return;}
+ this.role_=v;document.getElementById('v-app').classList.add('on');this.shell(v);},
+
+auth(m){this.go('auth');this.astep(m==='login'?'login':'role');this.otpInit();},
+astep(s){['role','login','otp','magic'].forEach(k=>{const e=document.getElementById('a-'+k);if(e)e.style.display=k===s?'':'none'});},
+role(r){this._r=r;const m={student:'p.sharma@imperial.ac.uk',recruiter:'hiring@northwind.io',admin:'admin@talenthub.io'};
+ document.getElementById('lgMail').value=m[r];document.getElementById('otpMail').textContent=m[r];this.astep('login');},
+oauth(){this.toast('Google OAuth');setTimeout(()=>this.otpDone(),650);},
+otpInit(){const b=document.getElementById('otpBox');if(b.children.length)return;
+ b.innerHTML=Array.from({length:6},()=>'<input maxlength="1">').join('');
+ const all=[...b.querySelectorAll('input')];
+ all.forEach((inp,i)=>{inp.addEventListener('input',e=>{e.target.classList.toggle('f',!!e.target.value);
+  if(e.target.value&&i<5)all[i+1].focus();if(all.every(x=>x.value))setTimeout(()=>this.otpDone(),320)});
+  inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!e.target.value&&i>0)all[i-1].focus()})});
+ setTimeout(()=>'284915'.split('').forEach((c,i)=>setTimeout(()=>{all[i].value=c;all[i].classList.add('f')},i*140)),800);},
+otpDone(){const r=this._r||'student';this.toast('Verified');setTimeout(()=>{r==='student'?this.go('onboard'):this.go(r)},520);},
+
+/* ── onboarding ── */
+_ob:1,
+obInit(){const u=document.getElementById('obUni');if(!u.children.length)u.innerHTML=A.unis.map(x=>`<option>${x}</option>`).join('');
+ const sk=document.getElementById('obSk');if(!sk.children.length)sk.innerHTML=['React','TypeScript','Node.js','Figma','Python','SQL','AWS','Docker','GraphQL','Rust','Go','PyTorch'].map((s,i)=>`<span class="chp ${i<4?'on':''}" onclick="this.classList.toggle('on')">${s}</span>`).join('');
+ const ro=document.getElementById('obRo');if(!ro.children.length)ro.innerHTML=['Software Engineering','Data & AI','Product','Design','Finance','Consulting'].map((s,i)=>`<span class="chp ${i<2?'on':''}" onclick="this.classList.toggle('on')">${s}</span>`).join('');
+ const d=document.getElementById('obDocs');if(!d.children.length)d.innerHTML=`<div class="row g12" style="border:1px solid var(--line);padding:12px"><span class="mono rust">PDF</span><div class="f1"><div class="bd-sm" style="color:var(--ink)">Degree_Certificate.pdf</div><div class="mono ink3 mt6">1.4 MB · OCR 98%</div></div><span class="tag tag-ok">Ready</span></div>`;
+ this._ob=1;this.obP();},
+upload(){const d=document.getElementById('obDocs'),r=document.createElement('div');
+ r.className='scanbox';r.style.cssText='border:1px solid var(--line);padding:12px;display:flex;gap:12px;align-items:center';
+ r.innerHTML=`<span class="mono rust">PDF</span><div class="f1"><div class="bd-sm" style="color:var(--ink)">Transcript_Y3.pdf</div><div class="mono ink3 mt6" id="upT">Uploading 0%</div></div><span class="tag">Scanning</span>`;
+ d.appendChild(r);let p=0;const t=setInterval(()=>{p+=Math.random()*24;
+  if(p>=100){clearInterval(t);r.classList.remove('scanbox');r.querySelector('#upT').textContent='820 KB · OCR 96%';
+   r.querySelector('.tag').className='tag tag-ok';r.querySelector('.tag').textContent='Ready';this.toast('Queued for review');}
+  else r.querySelector('#upT').textContent='Uploading '+Math.round(p)+'%';},250);},
+ob(d){const n=this._ob+d;if(n<1)return;if(n>5){this.toast('Record created');this.go('student');return;}this._ob=n;this.obP();},
+obP(){const n=this._ob;document.querySelectorAll('.ob').forEach(s=>s.style.display=+s.dataset.s===n?'':'none');
+ document.getElementById('obN').textContent='0'+n;document.getElementById('obPct').textContent=(n*20)+'%';
+ document.getElementById('obBar').style.width=(n*20)+'%';
+ document.getElementById('obBack').style.visibility=n===1?'hidden':'visible';
+ document.getElementById('obNext').textContent=n===5?'Finish →':'Continue →';},
+
+/* ── portal shell ── */
+shell(role){
+ const N={student:[['dash','Overview'],['builder','Record'],['public','Public'],['docs','Evidence'],['jobs','Roles'],['set','Settings']],
+  recruiter:[['dash','Overview'],['search','Search'],['short','Shortlist'],['pipe','Pipeline'],['set','Settings']],
+  admin:[['dash','Overview'],['verify','Verification'],['users','Users'],['unis','Institutions'],['ana','Analytics'],['set','Settings']]}[role];
+ const W={student:['Priya Sharma','Imperial College',S[0].img],recruiter:['Sarah Chen','Northwind Talent',S[4].img],admin:['James Okafor','Platform admin',S[5].img]}[role];
+ document.getElementById('sideName').textContent=W[0];document.getElementById('sideSub').textContent=W[1];
+ document.getElementById('sideAv').src=W[2];document.getElementById('topAv').src=W[2];
+ document.getElementById('sideNav').innerHTML=N.map((n,i)=>`<div class="snav ${i===0?'on':''}" data-p="${n[0]}" onclick="App.page('${n[0]}')">
+  <span class="mono" style="font-size:9px;opacity:.6">0${i+1}</span>${n[1]}</div>`).join('');
+ this.page('dash');},
+
+page(p){document.getElementById('side').classList.remove('open');
+ const f=this.role_+'_'+p;
+ document.getElementById('pbody').innerHTML=this[f]?this[f]():this.stub(p);
+ document.querySelectorAll('#sideNav .snav').forEach(n=>n.classList.toggle('on',n.dataset.p===p));
+ document.getElementById('crumb').textContent=this.role_+' / '+p;
+ scrollTo({top:0,behavior:'instant'});
+ requestAnimationFrame(()=>{
+  document.querySelectorAll('#pbody .mtr i,#pbody .sk .t i').forEach((b,i)=>setTimeout(()=>b.style.width=(b.dataset.w||70)+'%',60+i*70));
+  document.querySelectorAll('#pbody .ct').forEach(c=>this.count(c));});},
+
+stub(p){return `<div style="border:1px solid var(--line);padding:64px;text-align:center">
+ <span class="mono ink3">${p}</span><h3 class="dsp d-sm mt20">Scaffolded</h3>
+ <p class="bd mt14" style="max-width:40ch;margin-inline:auto">This section is stubbed — the flows alongside it demonstrate the full interaction pattern.</p></div>`;},
+
+/* ── student ── */
+student_dash(){return `
+<div class="btw wr g16"><div><div class="idx" style="border:none;padding:0"><span class="n">—</span><span class="t">Overview</span></div>
+ <h1 class="dsp d-sm mt10">Good morning, Priya.</h1>
+ <p class="bd mt10">Your record was opened <b style="color:var(--ink)">14 times</b> this week.</p></div>
+ <div class="row g10"><button class="btn btn-line btn-sm" onclick="App.page('public')">View public record</button>
+ <button class="btn btn-fill btn-sm" onclick="App.page('builder')">Continue</button></div></div>
+<div class="kg mt28">
+ <div><span class="mono ink3">Strength</span><b class="mono-n"><span class="ct" data-to="92">0</span>%</b><span class="mono" style="color:var(--olive)">↑ 14</span></div>
+ <div><span class="mono ink3">Score</span><b class="mono-n"><span class="ct" data-to="97">0</span></b><span class="mono ink3">top 4%</span></div>
+ <div><span class="mono ink3">Views</span><b class="mono-n"><span class="ct" data-to="142">0</span></b><span class="mono" style="color:var(--olive)">↑ 40%</span></div>
+ <div><span class="mono ink3">Evidence</span><b class="mono-n">6/7</b><span class="mono rust">1 pending</span></div></div>
+<div class="g2 mt28" style="grid-template-columns:1.5fr 1fr">
+ <div class="panel"><div class="btw"><h3 class="hd h-2">Suggested next</h3><span class="tag tag-rust">AI</span></div>
+  <div class="col g10 mt20">${[['Record your video introduction','Largest single driver of interview invitations','+11'],
+   ['Add two more projects','Records with 4+ projects are opened 2.3× more','+6'],
+   ['Resubmit identity document','Previous upload scored 38% legibility','req']].map(x=>`
+   <div class="row g14" style="border:1px solid var(--line);padding:14px">
+    <span class="mono rust">→</span><div class="f1"><div class="hd h-3">${x[0]}</div><div class="bd-sm mt6">${x[1]}</div></div>
+    <span class="tag ${x[2]==='req'?'tag-rust':''}">${x[2]==='req'?'Required':x[2]+' pts'}</span></div>`).join('')}</div></div>
+ <div class="panel"><h3 class="hd h-2">Completeness</h3>
+  <div class="col g14 mt20">${[['Education',100],['Experience',88],['Skills',100],['Attitude',76],['Evidence',86]].map(x=>`
+   <div><div class="btw"><span class="bd-sm">${x[0]}</span><span class="mono-n" style="font-size:11px">${x[1]}%</span></div>
+   <div class="mtr mt6"><i data-w="${x[1]}"></i></div></div>`).join('')}</div></div></div>
+<div class="panel mt28"><h3 class="hd h-2">Who opened your record</h3>
+ <table class="tb mt20"><thead><tr><th>Organisation</th><th class="hm">Role</th><th class="hm">Section viewed</th><th style="text-align:right">When</th></tr></thead>
+ <tbody>${[['Northwind Talent','Frontend Intern','Attitude · Evidence','2h ago'],['Monzo','Graduate Engineer','Experience','1d ago'],['Revolut','Product Analyst','Skills','3d ago']].map(r=>
+  `<tr><td><b>${r[0]}</b></td><td class="hm">${r[1]}</td><td class="hm">${r[2]}</td><td style="text-align:right" class="mono ink3">${r[3]}</td></tr>`).join('')}</tbody></table></div>`;},
+
+student_builder(){return `
+<div class="btw wr g16"><div><h1 class="dsp d-sm">Record</h1><p class="mono ink3 mt10">Autosaved · 4s ago</p></div>
+ <button class="btn btn-line btn-sm" onclick="App.page('public')">Preview</button></div>
+<div class="g2 mt28" style="grid-template-columns:200px 1fr">
+ <div style="border:1px solid var(--line);padding:12px;height:fit-content">
+  ${['Education','Experience','Projects','Skills','Certificates','Video','Attitude','Evidence'].map((s,i)=>`
+   <div class="snav ${i===3?'on':''}" onclick="App.toast('${s}')"><span class="mono" style="font-size:9px;opacity:.6">0${i+1}</span>${s}</div>`).join('')}
+  <div style="padding:14px 8px 4px"><div class="btw"><span class="mono ink3">Complete</span><span class="mono-n rust" style="font-size:11px">92%</span></div>
+  <div class="mtr mt6"><i data-w="92"></i></div></div></div>
+ <div class="col g16">
+  <div class="panel"><div class="btw"><h3 class="hd h-2">Skills</h3><button class="btn btn-line btn-sm" onclick="App.toast('Skill added')">＋ Add</button></div>
+   <div class="col g14 mt20">${S[0].sk.map((k,i)=>`<div class="sk"><span class="n">${k}</span><span class="t"><i data-w="${[94,90,82,76][i]}"></i></span><span class="mono-n" style="font-size:11px">${[9.4,9.0,8.2,7.6][i]}</span></div>`).join('')}</div></div>
+  <div class="panel"><div class="btw"><h3 class="hd h-2">Video introduction</h3><span class="tag tag-rust">Not recorded</span></div>
+   <p class="bd-sm mt10">90 seconds. The single largest driver of interview invitations.</p>
+   <div class="drop mt20" onclick="App.toast('Camera requested')"><span class="mono rust">● Record now</span>
+    <p class="bd-sm mt10">or upload MP4 — max 200 MB</p></div></div>
+  <div class="panel"><div class="btw"><h3 class="hd h-2">Attitude</h3><span class="tag tag-ok">Complete</span></div>
+   <div class="g3 mt20">${Object.entries(S[0].att).map(([k,v])=>`
+    <div style="border:1px solid var(--line);padding:15px"><div class="mono ink3">${k}</div>
+    <div class="mono-n rust" style="font-size:24px;font-weight:600;margin:8px 0 10px">${v}</div>
+    <div class="mtr"><i data-w="${v*10}"></i></div></div>`).join('')}</div></div></div></div>`;},
+
+student_public(){const s=S[0];return `
+<div style="border:1px solid var(--line)">
+ <div style="display:grid;grid-template-columns:auto 1fr;gap:0">
+  <div style="width:clamp(150px,20vw,210px);aspect-ratio:3/4;overflow:hidden;border-right:1px solid var(--line)">
+   <img src="${s.img}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1)"></div>
+  <div style="padding:clamp(18px,2.4vw,30px);display:flex;flex-direction:column;justify-content:space-between">
+   <div><div class="btw wr g10"><span class="mono ink3">Record no. 04182</span><span class="tag tag-ok">✓ Verified</span></div>
+    <h1 class="dsp d-md mt14">${s.n}</h1>
+    <p class="bd mt10">${s.d} · ${s.u} · Class of ${s.y}</p>
+    <p class="mono ink3 mt10">${s.loc} · available July 2026</p></div>
+   <div class="row g10 wr mt20"><button class="btn btn-line btn-sm" onclick="App.toast('CV exported')">Download CV</button>
+    <button class="btn btn-line btn-sm" onclick="App.toast('Link copied')">Share</button>
+    <button class="btn btn-fill btn-sm" onclick="App.toast('Message sent')">Contact</button></div></div></div></div>
+<div class="g2 mt28" style="grid-template-columns:1.5fr 1fr">
+ <div class="col g16">
+  <div class="panel"><h3 class="hd h-2">Education</h3><div class="tl mt20">
+   <div class="tli"><div class="hd h-3">BSc Computer Science — First Class (predicted)</div>
+    <div class="mono ink3 mt6">Imperial College London · 2023–2026</div>
+    <div class="row g8 mt10 wr"><span class="tag tag-ok">Certificate</span><span class="tag tag-ok">Transcript</span></div></div>
+   <div class="tli"><div class="hd h-3">International Baccalaureate — 42/45</div>
+    <div class="mono ink3 mt6">Delhi Public School · 2021–2023</div>
+    <div class="row g8 mt10"><span class="tag tag-ok">Verified</span></div></div></div></div>
+  <div class="panel"><h3 class="hd h-2">Experience</h3><div class="tl mt20">
+   <div class="tli"><div class="hd h-3">Frontend Engineering Intern</div><div class="mono ink3 mt6">Monzo · Summer 2025</div>
+    <p class="bd-sm mt10">Shipped the card-freeze flow to 400k users. Cut bundle size 22% migrating to code-split routes.</p>
+    <div class="row g8 mt10"><span class="tag tag-ok">Offer letter</span></div></div>
+   <div class="tli"><div class="hd h-3">Open Source Contributor</div><div class="mono ink3 mt6">React Testing Library · 2024–</div>
+    <p class="bd-sm mt10">14 merged PRs including async utilities used by 2M+ weekly downloads.</p></div></div></div>
+  <div class="panel"><h3 class="hd h-2">Skills</h3>
+   <div class="col g14 mt20">${s.sk.map((k,i)=>`<div class="sk"><span class="n">${k}</span><span class="t"><i data-w="${[94,90,82,76][i]}"></i></span><span class="mono-n" style="font-size:11px">${[9.4,9.0,8.2,7.6][i]}</span></div>`).join('')}</div></div></div>
+ <div class="col g16">
+  <div class="panel tc"><span class="mono ink3">Record score</span>
+   <div class="mono-n rust" style="font-size:64px;font-weight:600;letter-spacing:-.05em;line-height:1;margin:14px 0"><span class="ct" data-to="97">0</span></div>
+   <div class="mtr"><i data-w="97"></i></div>
+   <p class="bd-sm mt20">Top 4% of Computer Science 2026.</p></div>
+  <div class="panel"><h3 class="hd h-2">Attitude</h3>
+   <div class="col g14 mt20">${Object.entries(s.att).map(([k,v])=>`
+    <div><div class="btw"><span class="bd-sm">${k}</span><span class="mono-n" style="font-size:11px">${v}</span></div><div class="mtr mt6"><i data-w="${v*10}"></i></div></div>`).join('')}</div>
+   <div class="row g12 mt20" style="border-top:1px solid var(--line);padding-top:16px">
+    <span class="mono rust">▶</span><div class="f1"><div class="hd h-3">Video introduction</div><div class="mono ink3 mt6">1:24 · Mar 2026</div></div>
+    <button class="btn btn-line btn-sm" onclick="App.toast('Playing')">Play</button></div></div>
+  <div class="panel"><h3 class="hd h-2">Evidence</h3>
+   <div class="col g10 mt20">${['Degree certificate','Academic transcript','Monzo offer letter','AWS certification','Passport ID'].map(d=>
+    `<div class="row g10"><span class="mono" style="color:var(--olive)">✓</span><span class="bd-sm" style="color:var(--ink)">${d}</span></div>`).join('')}</div></div></div></div>`;},
+
+student_docs(){return `<h1 class="dsp d-sm">Evidence</h1><p class="bd mt10">Upload once. Reviewed by a human within 24 hours.</p>
+<div class="drop mt28" onclick="App.toast('File picker')"><span class="mono rust">＋ Drop files or browse</span>
+ <p class="bd-sm mt10">PDF, PNG, JPG — max 10 MB</p></div>
+<div class="col g10 mt28">${[['Degree_Certificate_2026.pdf','Education','approved','OCR 98%'],['Academic_Transcript.pdf','Education','approved','OCR 99%'],
+ ['Monzo_Offer_Letter.pdf','Experience','approved','OCR 96%'],['AWS_Certification.png','Certification','pending','in review'],
+ ['Passport_scan.jpg','Identity','rejected','OCR 38% — unreadable']].map(d=>`
+ <div class="row g14 wr" style="border:1px solid var(--line);padding:14px">
+  <span class="mono rust">${d[0].split('.').pop().toUpperCase()}</span>
+  <div class="f1" style="min-width:170px"><div class="hd h-3">${d[0]}</div><div class="mono ink3 mt6">${d[1]} · ${d[3]}</div></div>
+  <span class="tag ${d[2]==='approved'?'tag-ok':d[2]==='rejected'?'tag-rust':''}">${d[2]}</span>
+  ${d[2]==='rejected'?'<button class="btn btn-fill btn-sm" onclick="App.toast(\'Re-upload\')">Resubmit</button>':''}</div>`).join('')}</div>`;},
+
+/* ── recruiter ── */
+recruiter_dash(){return `
+<div class="btw wr g16"><div><h1 class="dsp d-sm">Archive overview</h1><p class="mono ink3 mt10">Northwind Talent · 342 unlocks remaining</p></div>
+ <button class="btn btn-fill btn-sm" onclick="App.page('search')">New search</button></div>
+<div class="kg mt28">
+ <div><span class="mono ink3">Records</span><b class="mono-n"><span class="ct" data-to="12480">0</span></b><span class="mono" style="color:var(--olive)">↑ 8.4%</span></div>
+ <div><span class="mono ink3">Verified</span><b class="mono-n"><span class="ct" data-to="9312">0</span></b><span class="mono ink3">75%</span></div>
+ <div><span class="mono ink3">Applications</span><b class="mono-n"><span class="ct" data-to="284">0</span></b><span class="mono" style="color:var(--olive)">↑ 22</span></div>
+ <div><span class="mono ink3">Shortlisted</span><b class="mono-n"><span class="ct" data-to="36">0</span></b><span class="mono ink3">9 interviews</span></div></div>
+<div class="g2 mt28" style="grid-template-columns:1.5fr 1fr">
+ <div class="panel"><div class="btw"><h3 class="hd h-2">Applications</h3><span class="mono ink3">30 days</span></div>
+  <svg viewBox="0 0 560 150" class="mt20" style="width:100%;height:150px" preserveAspectRatio="none">
+   <line x1="0" y1="40" x2="560" y2="40" stroke="var(--line)"/><line x1="0" y1="90" x2="560" y2="90" stroke="var(--line)"/>
+   <path d="M0,130 C70,122 100,96 150,100 C205,104 235,60 285,54 C340,48 370,72 420,38 C470,6 510,18 560,8" fill="none" stroke="var(--rust)" stroke-width="1.6"/>
+   <circle cx="420" cy="38" r="3.4" fill="var(--rust)"/></svg></div>
+ <div class="panel"><h3 class="hd h-2">Institutions</h3>
+  <div class="col g14 mt20">${[['Imperial',94],['UCL',81],['Edinburgh',72],['Manchester',64],['Warwick',52]].map(u=>`
+   <div><div class="btw"><span class="bd-sm">${u[0]}</span><span class="mono-n" style="font-size:11px">${u[1]}</span></div><div class="mtr mt6"><i data-w="${u[1]}"></i></div></div>`).join('')}</div></div></div>
+<div class="mt28"><div class="btw"><h3 class="hd h-2">Ranked for your open roles</h3><span class="tag tag-rust">AI</span></div>
+ <div class="g3 mt20">${S.slice(0,3).map(s=>this.cCard(s)).join('')}</div></div>`;},
+
+cCard(s){return `<div class="panel" style="cursor:pointer;padding:0;overflow:hidden" onclick="App.cand(${s.id})">
+ <div style="aspect-ratio:4/3;overflow:hidden"><img src="${s.img}" style="width:100%;height:100%;object-fit:cover;filter:grayscale(1)"></div>
+ <div style="padding:16px"><div class="btw"><span class="hd h-3">${s.n}</span><span class="mono-n rust" style="font-size:14px;font-weight:600">${s.score}</span></div>
+ <div class="mono ink3 mt6">${s.u}</div>
+ <div class="row g6 wr mt14">${s.sk.slice(0,3).map(k=>`<span class="tag">${k}</span>`).join('')}</div></div></div>`;},
+
+recruiter_search(){return `
+<h1 class="dsp d-sm">Search the archive</h1><p class="bd mt10">Describe who you need. Results are ranked and explained.</p>
+<div class="mt28" style="border:1px solid var(--line-2);padding:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+ <span class="mono rust">›</span>
+ <input class="fld" style="border:none;background:transparent;flex:1;min-width:200px;height:auto;padding:0;font-family:var(--mono);font-size:13px"
+  value="final-year CS in London who know React with verified internships">
+ <button class="btn btn-fill btn-sm" onclick="App.search()">Search</button></div>
+<div class="row g8 wr mt20">${['Verified only','London','2026','React','Score 85+'].map((f,i)=>`<span class="chp ${i<3?'on':''}" onclick="this.classList.toggle('on')">${f}</span>`).join('')}</div>
+<div class="btw mt28"><span class="mono ink3">6 matches</span>
+ <div class="seg"><button class="on">Relevance</button><button onclick="App.toast('By score')">Score</button></div></div>
+<div class="col g10 mt20" id="sres">${S.map((s,i)=>`
+ <div class="row g16 wr" style="border:1px solid var(--line);padding:14px;cursor:pointer;animation:vin .5s var(--e-out) ${i*.05}s both" onclick="App.cand(${s.id})">
+  <img class="avr" src="${s.img}" style="width:54px;height:54px;border-radius:2px">
+  <div class="f1" style="min-width:190px"><div class="row g8 wr"><span class="hd h-3">${s.n}</span>
+   <span class="tag ${s.v?'tag-ok':''}">${s.v?'Verified':'Unverified'}</span></div>
+   <div class="mono ink3 mt6">${s.d} · ${s.u}</div>
+   <div class="row g6 wr mt10">${s.sk.map(k=>`<span class="tag">${k}</span>`).join('')}</div></div>
+  <div class="col g8" style="align-items:flex-end"><span class="mono-n rust" style="font-size:22px;font-weight:600">${s.score}</span>
+   <span class="mono ink3">${s.loc} · ${s.y}</span>
+   <div class="row g6"><button class="btn btn-line btn-sm" onclick="event.stopPropagation();App.toast('Shortlisted')">Save</button>
+   <button class="btn btn-fill btn-sm" onclick="event.stopPropagation();App.toast('Contact sent')">Contact</button></div></div></div>`).join('')}</div>`;},
+
+search(){const b=document.getElementById('sres');
+ b.innerHTML=Array.from({length:4},()=>`<div style="border:1px solid var(--line);padding:14px;display:flex;gap:16px">
+  <div class="skl" style="width:54px;height:54px"></div><div class="f1"><div class="skl" style="width:32%;height:11px"></div>
+  <div class="skl mt10" style="width:56%;height:9px"></div><div class="skl mt10" style="width:42%;height:9px"></div></div></div>`).join('');
+ this.toast('Running retrieval');setTimeout(()=>{this.page('search');this.toast('6 matches');},1400);},
+
+cand(id){const s=F(id);
+ document.getElementById('mdlBody').innerHTML=`
+ <div class="btw"><span class="mono ink3">Record no. 0${4000+s.id}</span>
+  <button class="ibtn" style="width:28px;height:28px" onclick="App.close()">✕</button></div>
+ <div class="row g20 mt20 wr">
+  <img src="${s.img}" style="width:96px;height:120px;object-fit:cover;filter:grayscale(1);border-radius:2px">
+  <div class="f1" style="min-width:200px"><div class="row g8 wr"><h3 class="dsp d-sm">${s.n}</h3>${s.v?'<span class="tag tag-ok">Verified</span>':''}</div>
+   <p class="bd mt10">${s.d} · ${s.u}</p><p class="mono ink3 mt6">${s.loc} · ${s.y} · seeking ${s.role}</p></div>
+  <div style="text-align:right"><div class="mono-n rust" style="font-size:38px;font-weight:600;letter-spacing:-.04em">${s.score}</div>
+   <div class="mono ink3">match</div></div></div>
+ <div class="g3 mt28">${Object.entries(s.att).map(([k,v])=>`
+  <div style="border:1px solid var(--line);padding:14px"><div class="mono ink3">${k}</div>
+  <div class="mono-n" style="font-size:22px;font-weight:600;margin-top:8px">${v}</div></div>`).join('')}</div>
+ <div class="mt28"><span class="mono ink3">Why this ranked</span>
+  <div class="col g10 mt14">${['Verified internship at a fintech — matches the role requirement',
+   'React and TypeScript rated 9.0+ — top decile of cohort','Available July 2026 — aligns with your start date'].map(r=>
+   `<div class="row g10"><span class="mono rust">—</span><span class="bd-sm" style="color:var(--ink)">${r}</span></div>`).join('')}</div></div>
+ <div class="row g10 mt28 wr"><button class="btn btn-line f1" onclick="App.toast('Shortlisted')">Shortlist</button>
+  <button class="btn btn-line f1" onclick="App.toast('CV exported')">Download CV</button>
+  <button class="btn btn-rust f1" onclick="App.toast('Invite sent')">Invite</button></div>`;
+ this.open();},
+
+/* ── admin ── */
+admin_dash(){return `
+<div class="btw wr g16"><div><h1 class="dsp d-sm">Platform</h1><p class="mono ink3 mt10">3 documents awaiting review</p></div>
+ <button class="btn btn-fill btn-sm" onclick="App.page('verify')">Review queue</button></div>
+<div class="kg mt28">
+ <div><span class="mono ink3">Students</span><b class="mono-n"><span class="ct" data-to="12480">0</span></b><span class="mono" style="color:var(--olive)">↑ 18.2%</span></div>
+ <div><span class="mono ink3">Recruiters</span><b class="mono-n"><span class="ct" data-to="912">0</span></b><span class="mono" style="color:var(--olive)">↑ 12.7%</span></div>
+ <div><span class="mono ink3">Pending</span><b class="mono-n"><span class="ct" data-to="3">0</span></b><span class="mono rust">avg 4h</span></div>
+ <div><span class="mono ink3">Verified rate</span><b class="mono-n">74.6%</b><span class="mono" style="color:var(--olive)">↑ 3.1%</span></div></div>
+<div class="g2 mt28" style="grid-template-columns:1.5fr 1fr">
+ <div class="panel"><h3 class="hd h-2">Registrations</h3>
+  <svg viewBox="0 0 560 150" class="mt20" style="width:100%;height:150px">
+   ${[42,58,50,74,66,88,96,112].map((v,i)=>`<rect x="${i*68+10}" y="${140-v}" width="42" height="${v}" fill="var(--rust)" opacity="${.35+i*.08}"/>`).join('')}</svg></div>
+ <div class="panel"><h3 class="hd h-2">Outcomes</h3>
+  <div class="col g14 mt20">${[['Approved',68],['Pending',18],['Rejected',14]].map(x=>`
+   <div><div class="btw"><span class="bd-sm">${x[0]}</span><span class="mono-n" style="font-size:11px">${x[1]}%</span></div><div class="mtr mt6"><i data-w="${x[1]}"></i></div></div>`).join('')}</div></div></div>
+<div class="panel mt28"><h3 class="hd h-2">Recent activity</h3>
+ <table class="tb mt20"><thead><tr><th>Student</th><th class="hm">Document</th><th class="hm">Type</th><th>Status</th></tr></thead>
+ <tbody>${A.docs.map(d=>`<tr><td><b>${d.s}</b></td><td class="hm">${d.n}</td><td class="hm">${d.t}</td>
+  <td><span class="tag ${d.st==='approved'?'tag-ok':d.st==='rejected'?'tag-rust':''}">${d.st}</span></td></tr>`).join('')}</tbody></table></div>`;},
+
+admin_verify(){return `
+<div class="btw wr g16"><div><h1 class="dsp d-sm">Verification</h1><p class="bd mt10">Approve, reject, or request resubmission.</p></div>
+ <div class="seg"><button class="on">Pending</button><button onclick="App.toast('Approved')">Approved</button><button onclick="App.toast('Rejected')">Rejected</button></div></div>
+<div class="col g12 mt28">${A.docs.map((d,i)=>`
+ <div style="border:1px solid var(--line);padding:16px">
+  <div class="row g16 wr">
+   <div class="${d.st==='pending'?'scanbox':''}" style="width:46px;height:58px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+    <span class="mono rust" style="font-size:9px">${d.n.split('.').pop().toUpperCase()}</span></div>
+   <div class="f1" style="min-width:180px"><div class="row g8 wr"><span class="hd h-3">${d.n}</span>
+    <span class="tag ${d.st==='approved'?'tag-ok':d.st==='rejected'?'tag-rust':''}">${d.st}</span></div>
+    <div class="mono ink3 mt6">${d.s} · ${d.t} · ${d.sz}</div>
+    <div class="row g8 wr mt10"><span class="tag ${d.ocr>85?'tag-ok':'tag-rust'}">OCR ${d.ocr}%</span>
+     <span class="tag ${d.ocr>60?'tag-ok':'tag-rust'}">${d.ocr>60?'No fraud signals':'Quality too low'}</span></div></div>
+   <div class="row g8 wr">${d.st==='pending'?`
+    <button class="btn btn-line btn-sm" onclick="App.dec(this,'resubmit')">Resubmit</button>
+    <button class="btn btn-line btn-sm" onclick="App.dec(this,'reject')">Reject</button>
+    <button class="btn btn-fill btn-sm" onclick="App.dec(this,'approve')">Approve</button>`:''}</div></div></div>`).join('')}</div>`;},
+
+dec(btn,w){const card=btn.closest('div[style*="border"]').parentElement.parentElement;
+ const tag=card.querySelector('.tag');
+ const m={approve:['tag tag-ok','approved','Approved — student notified'],reject:['tag tag-rust','rejected','Rejected — reason sent'],resubmit:['tag','resubmit','Resubmission requested']};
+ tag.className=m[w][0];tag.textContent=m[w][1];
+ btn.parentElement.innerHTML='<span class="mono ink3">Actioned</span>';
+ card.style.opacity='.6';this.toast(m[w][2]);},
+
+admin_users(){return `<h1 class="dsp d-sm">Users</h1><p class="mono ink3 mt10">12,480 students · 912 recruiters · 64 institutions</p>
+<div class="panel mt28" style="overflow-x:auto"><table class="tb">
+ <thead><tr><th>Student</th><th class="hm">Institution</th><th class="hm">Course</th><th>Score</th><th>Status</th><th></th></tr></thead>
+ <tbody>${S.map(s=>`<tr><td><div class="row g10"><img class="avr a32" src="${s.img}"><b>${s.n}</b></div></td>
+  <td class="hm">${s.u}</td><td class="hm">${s.d}</td><td><b class="mono-n">${s.score}</b></td>
+  <td><span class="tag ${s.v?'tag-ok':''}">${s.v?'Verified':'Pending'}</span></td>
+  <td style="text-align:right"><button class="btn btn-line btn-sm" onclick="App.cand(${s.id})">Open</button></td></tr>`).join('')}</tbody></table></div>`;},
+
+admin_ana(){return `<h1 class="dsp d-sm">Analytics</h1><p class="bd mt10">Funnel and platform health.</p>
+<div class="kg mt28">
+ <div><span class="mono ink3">Signups</span><b class="mono-n"><span class="ct" data-to="24890">0</span></b><span class="mono" style="color:var(--olive)">↑ 21.4%</span></div>
+ <div><span class="mono ink3">Completion</span><b class="mono-n">68.2%</b><span class="mono" style="color:var(--olive)">↑ 4.1%</span></div>
+ <div><span class="mono ink3">Avg session</span><b class="mono-n">8m 42s</b><span class="mono" style="color:var(--olive)">↑ 1m</span></div>
+ <div><span class="mono ink3">Conversion</span><b class="mono-n">3.4%</b><span class="mono" style="color:var(--olive)">↑ 0.6%</span></div></div>
+<div class="panel mt28"><h3 class="hd h-2">Student journey</h3>
+ <div class="col g20 mt20">${[['Landed','24,890',100],['Registered','14,120',57],['Completed onboarding','9,940',40],
+  ['Uploaded evidence','7,310',29],['Fully verified','5,652',23],['Contacted','2,108',8.5]].map(f=>`
+  <div><div class="btw"><span class="bd-sm">${f[0]}</span><span class="mono-n" style="font-size:12px">${f[1]} · ${f[2]}%</span></div>
+  <div class="mtr mt6"><i data-w="${f[2]}"></i></div></div>`).join('')}</div></div>`;},
+
+/* ── ui ── */
+notif(){const N=[['Recruiter opened your record','Northwind Talent · 12m'],['Document approved','Degree certificate · 2h'],
+ ['Score improved','78 → 92 · 1d'],['Interview invitation','Monzo · 2d'],['Document rejected','ID scan unreadable · 3d']];
+ document.getElementById('mdlBody').innerHTML=`<div class="btw"><h3 class="dsp d-sm">Notifications</h3>
+  <button class="ibtn" style="width:28px;height:28px" onclick="App.close()">✕</button></div>
+  <div class="col g10 mt20">${N.map(n=>`<div class="row g12" style="border:1px solid var(--line);padding:13px">
+   <span class="mono rust">—</span><div class="f1"><div class="hd h-3">${n[0]}</div><div class="mono ink3 mt6">${n[1]}</div></div></div>`).join('')}</div>`;
+ this.open();},
+open(){document.getElementById('scrim').classList.add('on');document.getElementById('mdl').classList.add('on');},
+close(){document.getElementById('scrim').classList.remove('on');document.getElementById('mdl').classList.remove('on');},
+toast(m){const t=document.getElementById('tst');document.getElementById('tstMsg').textContent=m;
+ t.classList.add('on');clearTimeout(this._t);this._t=setTimeout(()=>t.classList.remove('on'),2300);},
+};
+window.App=App;
+addEventListener('keydown',e=>{if(e.key==='Escape')App.close()});
+document.addEventListener('DOMContentLoaded',()=>App.init());
+</script>
+</body>
+</html>
